@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi primera PWA</title>
+
+    <!-- Vincular el manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Meta tags para PWA -->
+    <meta name="theme-color" content="#2196f3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PWA Demo">
+    <meta name="description" content="Una aplicación web progresiva de ejemplo">
+    
+    <!-- Iconos para iOS -->
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+    
+    <!-- Icono para la pestaña del navegador -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png">
+</head>
+<body>
+    <h1>Bienvenido a mi PWA</h1>
+    <p>Se puede instalar como aplicación en tu celular</p>
+    
+    <button onclick="alert('Hola desde la PWA')">Click aquí</button>
+    
+    <p><a href="login.html">Login</a></p>
+    
+    <!-- Botón de instalación PWA -->
+    <div id="installPrompt" style="display: none; margin: 20px 0; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+        <h3> Instalar como App</h3>
+        <p>Puedes instalar esta PWA en tu dispositivo para usarla como una app nativa.</p>
+        <button id="installBtn" onclick="installPWA()" style="background: #09adc3; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+            Instalar App
+        </button>
+        <button onclick="hideInstallPrompt()" style="background: #e0bc07; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+            Cancelar
+        </button>
+    </div>
+    
+    <div id="installedMsg" style="display: none; margin: 20px 0; padding: 15px; background: #d4edda; border-radius: 8px;">
+        <h3>Instalada</h3>
+        <p>App Instalada</p>
+    </div>
+
+    <!-- Registrar el Service Worker -->
+    <script>
+        let deferredPrompt;
+        
+        // Registrar Service Worker
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("sw.js").then(reg => console.log("Service Worker registrado"))
+            .catch(err => console.log("Error al registrar el Service Worker"))
+        }
+        
+        // Detectar si ya está instalada
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            document.getElementById('installedMsg').style.display = 'block';
+        }
+        
+        // Detectar evento de instalación
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').style.display = 'block';
+        });
+        
+        // Función para instalar PWA
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Usuario aceptó la instalación');
+                        document.getElementById('installPrompt').style.display = 'none';
+                        document.getElementById('installedMsg').style.display = 'block';
+                    } else {
+                        console.log('Usuario rechazó la instalación');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        // Ocultar prompt de instalación
+        function hideInstallPrompt() {
+            document.getElementById('installPrompt').style.display = 'none';
+        }
+        
+        // Detectar si se instaló después de cerrar y abrir
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA instalada');
+            document.getElementById('installPrompt').style.display = 'none';
+            document.getElementById('installedMsg').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

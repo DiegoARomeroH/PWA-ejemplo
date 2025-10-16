@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Login</title>
+</head>
+<body>
+    <h1>Simulador de Login</h1>
+
+    <form onsubmit="return simularLogin(event)">
+        <label>
+            Usuario
+            <input type="text" id="usuario" required>
+        </label>
+        <br>
+        <label>
+            Contraseña
+            <input type="password" id="contrasena" required>
+        </label>
+        <br>
+        <button type="submit">Iniciar sesión</button>
+    </form>
+
+    <p><a href="index.html">Volver al inicio</a></p>
+
+    <script>
+        // Si no hay conexión, redirigir automáticamente a offline
+        if (!navigator.onLine) {
+            window.location.replace('offline.html');
+        }
+
+        function simularLogin(event){
+            event.preventDefault();
+            alert('Sin conexión. Modo offline.');
+            window.location.href = 'offline.html';
+            return false;
+        }
+    </script>
+</body>
+</html>
